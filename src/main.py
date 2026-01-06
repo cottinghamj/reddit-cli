@@ -228,11 +228,22 @@ class RedditCLI:
             # Show welcome screen
             self.show_welcome()
             # Get search query from user
-            query = input("\nEnter search query: ").strip()
-            if not query:
-                self.console.print("[red]No query provided. Exiting.[/red]")
-                return
-            self.search(query)
+            while True:
+                query = input("\nEnter search query: ").strip()
+                if not query:
+                    self.console.print(
+                        "[red]No query provided. Please try again.[/red]"
+                    )
+                    continue
+                try:
+                    self.search(query)
+                    break
+                except Exception as e:
+                    if "User requested new search" in str(e):
+                        # Continue the loop to get a new search query
+                        continue
+                    else:
+                        raise e
         else:
             # Process the provided query
             self.search(args.query)
@@ -295,7 +306,30 @@ class RedditCLI:
 
                 if not posts:
                     self.console.print("[yellow]No results found[/yellow]")
-                    return
+                    # Instead of returning, ask user if they want to search again
+                    while True:
+                        choice = (
+                            input("\nWould you like to perform a new search? (y/n): ")
+                            .strip()
+                            .lower()
+                        )
+                        if choice in ["y", "yes"]:
+                            new_query = input("Enter new search query: ").strip()
+                            if new_query:
+                                self.search(new_query)
+                                return
+                            else:
+                                self.console.print(
+                                    "[yellow]No query provided.[/yellow]"
+                                )
+                                continue
+                        elif choice in ["n", "no"]:
+                            # Return to main menu by raising an exception that gets caught
+                            raise Exception("User requested new search")
+                        else:
+                            self.console.print(
+                                "[red]Please enter 'y' for yes or 'n' for no[/red]"
+                            )
 
                 self.search_results = posts
                 self.current_page = 0
