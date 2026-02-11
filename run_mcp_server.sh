@@ -5,17 +5,8 @@
 
 echo "Starting Reddit MCP Server..."
 
-# Check if virtual environment exists
-if [ ! -d "venv" ]; then
-    echo "Virtual environment not found. Please run setup.sh first."
-    exit 1
-fi
-
-# Activate virtual environment
-source venv/bin/activate
-
 # Set default environment variables if not already set
-export OLLAMA_BASE_URL="${OLLAMA_BASE_URL:-http://192.168.8.223:11434}"
+export OLLAMA_BASE_URL="${OLLAMA_BASE_URL:-http://host.docker.internal:11434}"
 export OLLAMA_MODEL="${OLLAMA_MODEL:-gpt-oss:20b}"
 export PORT="${PORT:-5000}"
 
@@ -39,7 +30,7 @@ echo "  GET /openapi.json"
 echo ""
 echo "Press Ctrl+C to stop the server"
 
-# Run the MCP server
-python src/mcp_server.py
+# Run the MCP server directly with python3
+python3 src/mcp_server.py
 
 echo "Server stopped."
