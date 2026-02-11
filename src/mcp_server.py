@@ -25,7 +25,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Global configuration
-OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://192.168.8.223:11434")
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://home.ms:4000")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gpt-oss:20b")
 REDDIT_BASE_URL = "https://www.reddit.com"
 
@@ -173,12 +173,14 @@ class RedditClient:
 
 
 class AIClient:
-    """Client for interacting with Ollama AI API with retry logic"""
+    """Client for interacting with AI API with retry logic"""
 
     def __init__(self):
         self.base_url = OLLAMA_BASE_URL
         self.model = OLLAMA_MODEL
         self.session = requests.Session()
+        # Set the API key for the new endpoint
+        self.api_key = "111"  # As specified in the feedback
 
     def _make_request_with_retry(self, url: str, json_data: Dict = None, max_retries: int = 3, 
                                retry_delay: float = 1.0) -> requests.Response:
@@ -199,7 +201,9 @@ class AIClient:
         """
         for attempt in range(max_retries + 1):
             try:
-                response = self.session.post(url, json=json_data, timeout=30)
+                # Add API key to headers
+                headers = {"x-api-key": self.api_key}
+                response = self.session.post(url, json=json_data, headers=headers, timeout=30)
                 response.raise_for_status()
                 return response
             except requests.exceptions.RequestException as e:
