@@ -173,7 +173,7 @@ class RedditClient:
 
 
 class AIClient:
-    """Client for interacting with AI API with retry logic"""
+    """Client for interacting with OpenAPI AI API with retry logic"""
 
     def __init__(self):
         self.base_url = OLLAMA_BASE_URL
@@ -201,8 +201,8 @@ class AIClient:
         """
         for attempt in range(max_retries + 1):
             try:
-                # Add API key to headers
-                headers = {"x-api-key": self.api_key}
+                # Add API key to Authorization header as Bearer token
+                headers = {"Authorization": f"Bearer {self.api_key}"}
                 response = self.session.post(url, json=json_data, headers=headers, timeout=30)
                 response.raise_for_status()
                 return response
